@@ -344,7 +344,20 @@ document.getElementById('locationInput').addEventListener('keydown', (e) => {
 
 function searchLocation() {
   const query = document.getElementById('locationInput').value.trim();
-  if (!query) return;
+  if (!query) {
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        currentLat = position.coords.latitude;
+        currentLng = position.coords.longitude;
+        openMap(currentLat, currentLng);
+        loadRestaurants(currentLat, currentLng, document.querySelector('.filterBtn.active').dataset.type);
+      },
+      error => {
+        alert('위치 정보를 가져올 수 없어요 😢');
+      }
+    );
+    return;
+  }
 
   const geocoder = new google.maps.Geocoder();
   geocoder.geocode({ address: '대한민국 ' + query, region: 'KR' }, (results, status) => {
@@ -476,5 +489,38 @@ function toggleReviews(btn) {
   } else {
     more.style.display = 'none';
     btn.textContent = '리뷰 보기 ▼';
+  }
+}
+
+function openMap(lat, lng) {
+  const container = document.getElementById('mapContainer');
+  if (!mapOpen) {
+    mapOpen = true;
+    container.classList.add('open');
+    document.getElementById('mapToggleBtn').textContent = '🗺️ 지도 닫기';
+  }
+
+  if (!map) {
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: { lat, lng },
+      zoom: 15,
+      disableDefaultUI: true,
+      zoomControl: true,
+    });
+
+    map.addListener('click', (e) => {
+      currentLat = e.latLng.lat();
+      currentLng = e.latLng.lng();
+      if (marker) marker.setMap(null);
+      marker = new google.maps.Marker({
+        position: { lat: currentLat, lng: currentLng },
+        map: map,
+        title: '선택한 위치'
+      });
+      loadRestaurants(currentLat, currentLng, document.querySelector('.filterBtn.active').dataset.type);
+    });
+  } else {
+    map.setCenter({ lat, lng });
+    map.setZoom(15);
   }
 }
