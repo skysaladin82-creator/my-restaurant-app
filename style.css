@@ -1,0 +1,492 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  background: #f5f5f5;
+  color: #333;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+header h1 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+#myListBtn {
+  background: #FF6B35;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#searchBar {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+#locationInput {
+  flex: 1;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 14px;
+  outline: none;
+}
+
+#locationInput:focus {
+  border-color: #FF6B35;
+}
+
+#searchBtn {
+  background: #FF6B35;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#myLocationBtn {
+  background: #f0f0f0;
+  color: #333;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#filterBar {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  overflow-x: auto;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+#filterBar::-webkit-scrollbar {
+  display: none;
+}
+
+.filterBtn {
+  background: #f0f0f0;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  color: #555;
+}
+
+.filterBtn.active {
+  background: #FF6B35;
+  color: white;
+}
+
+#radiusBar {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+.radiusBtn {
+  background: #f0f0f0;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #555;
+}
+
+.radiusBtn.active {
+  background: #333;
+  color: white;
+}
+
+#mapContainer {
+  position: relative;
+  display: none;
+}
+
+#mapContainer.open {
+  display: block;
+}
+
+#map {
+  width: 100%;
+  height: 300px;
+}
+
+#mapToggleBtn {
+  text-align: center;
+  padding: 10px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  font-size: 14px;
+  color: #555;
+}
+
+#mapToggleBtn:hover {
+  background: #f9f9f9;
+}
+
+#restaurantList {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#loadingMsg {
+  text-align: center;
+  color: #888;
+  margin-top: 40px;
+  font-size: 15px;
+}
+
+.restaurantCard {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  cursor: pointer;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.restaurantCard:active {
+  transform: scale(0.98);
+}
+
+.cardPhoto {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  object-fit: cover;
+  object-position: center;
+  background: #eee;
+  flex-shrink: 0;
+}
+
+.cardInfo {
+  flex: 1;
+}
+
+.cardName {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.cardCategory {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 6px;
+}
+
+.cardRating {
+  font-size: 14px;
+  color: #FF6B35;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.cardOpen {
+  font-size: 12px;
+  color: #4CAF50;
+}
+
+.cardClosed {
+  font-size: 12px;
+  color: #f44336;
+}
+
+#popup, #myListPopup {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+}
+
+#popup.hidden, #myListPopup.hidden {
+  display: none;
+}
+
+#popupContent, #myListContent {
+  background: #fff;
+  width: 100%;
+  max-height: 85vh;
+  border-radius: 20px 20px 0 0;
+  padding: 20px;
+  overflow-y: auto;
+  position: relative;
+}
+
+#closePopup, #closeMyList {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #f0f0f0;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#popupHeader {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+#popupHeader img {
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
+  object-fit: cover;
+  object-position: center;
+  background: #eee;
+  flex-shrink: 0;
+}
+
+#popupHeaderInfo {
+  flex: 1;
+}
+
+.popupName {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.popupRating {
+  font-size: 16px;
+  color: #FF6B35;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.popupInfo {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.popupBtns {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btnGoogle {
+  background: #4285F4;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btnNaver {
+  background: #03C75A;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btnKakao {
+  background: #FEE500;
+  color: #3C1E1E;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btnSave {
+  background: #fff;
+  color: #FF6B35;
+  border: 2px solid #FF6B35;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#myListContent h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.myListItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.myListDelete {
+  background: none;
+  border: none;
+  color: #f44336;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.emptyMsg {
+  text-align: center;
+  color: #aaa;
+  margin-top: 40px;
+  font-size: 15px;
+}
+
+.memoInput {
+  width: 100%;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #555;
+  resize: none;
+  margin-top: 6px;
+  font-family: inherit;
+  outline: none;
+}
+
+.memoInput:focus {
+  border-color: #FF6B35;
+}
+
+.memoText {
+  font-size: 13px;
+  color: #888;
+  margin-top: 4px;
+  cursor: pointer;
+  min-height: 20px;
+}
+
+.memoText:empty::before {
+  content: '+ 메모 추가';
+  color: #ccc;
+}
+
+.reviewSection {
+  margin-top: 16px;
+  border-top: 1px solid #eee;
+  padding-top: 16px;
+}
+
+#reviewMore {
+  max-height: 250px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 0 10px;
+  margin-bottom: 8px;
+}
+
+#reviewMore::-webkit-scrollbar {
+  width: 4px;
+}
+
+#reviewMore::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 2px;
+}
+
+.reviewTitle {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.reviewItem {
+  padding: 10px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.reviewAuthor {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.reviewRating {
+  font-size: 12px;
+  color: #FF6B35;
+  margin-bottom: 4px;
+}
+
+.reviewText {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.reviewMore {
+  background: none;
+  border: 1px solid #ddd;
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.reviewMore:hover {
+  background: #f9f9f9;
+}
