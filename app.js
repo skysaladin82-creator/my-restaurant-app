@@ -541,3 +541,16 @@ function markVisit(name, address) {
     alert(`📅 ${name} 방문 기록 저장됐어요!`);
   }
 }
+
+// 목록 검색
+document.getElementById('searchListInput').addEventListener('input', (e) => {
+  const query = e.target.value.trim().toLowerCase();
+  if (!query) {
+    renderCards(currentPlaces);
+    return;
+  }
+  const filtered = currentPlaces.filter(p =>
+    (p.displayName?.text || '').toLowerCase().includes(query)
+  );
+  renderCards(filtered);
+});

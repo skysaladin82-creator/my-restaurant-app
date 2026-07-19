@@ -519,3 +519,22 @@ header h1 {
   color: #4CAF50;
   margin-top: 4px;
 }
+
+#searchListBar {
+  padding: 10px 16px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+#searchListInput {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 14px;
+  outline: none;
+}
+
+#searchListInput:focus {
+  border-color: #FF6B35;
+}
