@@ -1,0 +1,9 @@
+{
+  "appId": "com.myrestaurant.app",
+  "appName": "내주변맛집",
+  "webDir": "www",
+  "server": {
+    "url": "https://my-restaurant-app-amber.vercel.app",
+    "cleartext": true
+  }
+}

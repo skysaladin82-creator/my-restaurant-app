@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>내 주변 맛집</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBmUiGjUvv5XqKQGTZHmCSZoTW1Odko32w&libraries=places&language=ko"></script>
+</head>
+<body>
+
+  <header>
+    <h1>🍽️ 내 주변 맛집</h1>
+    <button id="myListBtn">⭐ 내 맛집</button>
+  </header>
+
+  <div id="searchBar">
+    <input type="text" id="locationInput" placeholder="동네 이름이나 주소 입력 (예: 강남구 역삼동)">
+    <button id="searchBtn">검색</button>
+    <button id="myLocationBtn">📍 내 위치</button>
+  </div>
+
+  <div id="filterBar">
+    <button class="filterBtn active" data-type="">전체</button>
+    <button class="filterBtn" data-type="korean">한식</button>
+    <button class="filterBtn" data-type="japanese">일식</button>
+    <button class="filterBtn" data-type="chinese">중식</button>
+    <button class="filterBtn" data-type="western">양식</button>
+    <button class="filterBtn" data-type="cafe">카페</button>
+  </div>
+
+  <div id="radiusBar">
+    <button class="radiusBtn active" data-radius="500">500m</button>
+    <button class="radiusBtn" data-radius="1000">1km</button>
+    <button class="radiusBtn" data-radius="2000">2km</button>
+  </div>
+
+  <!-- 지도 -->
+  <div id="mapContainer">
+    <div id="map"></div>
+    <div id="mapToggleBtn">🗺️ 지도 핀 찍기</div>
+  </div>
+
+  <main id="restaurantList">
+    <p id="loadingMsg">📍 위치 정보를 가져오는 중...</p>
+  </main>
+
+  <div id="popup" class="hidden">
+    <div id="popupContent">
+      <button id="closePopup">✕</button>
+      <div id="popupBody"></div>
+    </div>
+  </div>
+
+  <div id="myListPopup" class="hidden">
+    <div id="myListContent">
+      <button id="closeMyList">✕</button>
+      <h2>⭐ 내 맛집 리스트</h2>
+      <div id="myListBody"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
