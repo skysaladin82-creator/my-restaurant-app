@@ -18,7 +18,8 @@ navigator.geolocation.getCurrentPosition(
   },
   error => {
     showLoading('위치 정보를 가져올 수 없어요 😢');
-  }
+  },
+  { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000}
 );
 
 function showLoading(msg) {
@@ -323,6 +324,7 @@ document.querySelectorAll('.radiusBtn').forEach(btn => {
 
 // 내 위치 버튼
 document.getElementById('myLocationBtn').onclick = () => {
+  document.getElementById('locationInput').value = '';
   navigator.geolocation.getCurrentPosition(
     position => {
       currentLat = position.coords.latitude;
@@ -332,7 +334,8 @@ document.getElementById('myLocationBtn').onclick = () => {
     },
     error => {
       alert('위치 정보를 가져올 수 없어요 😢');
-    }
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000}
   );
 };
 
@@ -354,7 +357,8 @@ function searchLocation() {
       },
       error => {
         alert('위치 정보를 가져올 수 없어요 😢');
-      }
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000}
     );
     return;
   }
