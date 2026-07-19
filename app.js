@@ -537,6 +537,13 @@ function markVisit(name, address) {
   if (idx >= 0) {
     const now = new Date();
     const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
+    
+    // 오늘 이미 방문 기록했으면 무시
+    if (myList[idx].lastVisit === dateStr) {
+      alert(`오늘 이미 방문 기록했어요! 😊`);
+      return;
+    }
+
     myList[idx].lastVisit = dateStr;
     myList[idx].visitCount = (myList[idx].visitCount || 0) + 1;
     localStorage.setItem('myList', JSON.stringify(myList));
