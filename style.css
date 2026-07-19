@@ -69,10 +69,11 @@ header h1 {
 
 #locationInput {
   flex: 1;
+  min-width: 0;
   border: 1px solid #ddd;
   border-radius: 20px;
-  padding: 8px 14px;
-  font-size: 14px;
+  padding: 8px 10px;
+  font-size: 13px;
   outline: none;
 }
 
