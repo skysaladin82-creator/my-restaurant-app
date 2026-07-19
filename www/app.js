@@ -8,6 +8,7 @@ let currentRadius = 500;
 let map = null;
 let marker = null;
 let mapOpen = false;
+let currentSort = 'name';
 
 // 내 위치로 시작
 navigator.geolocation.getCurrentPosition(
@@ -18,7 +19,8 @@ navigator.geolocation.getCurrentPosition(
   },
   error => {
     showLoading('위치 정보를 가져올 수 없어요 😢');
-  }
+  },
+  { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000}
 );
 
 function showLoading(msg) {
@@ -100,8 +102,9 @@ function renderCards(places) {
   }).join('');
 }
 
-function getSearchQuery(name) {
-  return encodeURIComponent(name);
+function getSearchQuery(name, address) {
+  const shortAddr = address ? address.replace('대한민국', '').trim().split(' ').slice(0, 3).join(' ') : '';
+  return encodeURIComponent(name + (shortAddr ? ' ' + shortAddr : ''));
 }
 
 function openPopup(idx, fromMyList = false) {
@@ -120,7 +123,7 @@ function openPopup(idx, fromMyList = false) {
     : null;
 
   const isSaved = myList.some(item => item.name === name && item.address === address);
-  const searchQuery = getSearchQuery(name);
+  const searchQuery = getSearchQuery(name, address);
 
   document.getElementById('popupBody').innerHTML = `
     <div id="popupHeader">
@@ -136,12 +139,21 @@ function openPopup(idx, fromMyList = false) {
     <div class="popupInfo">
       <textarea class="memoInput" rows="2" placeholder="메모를 입력하세요" onchange="saveMemo(${idx}, this.value)">${getMemo(name, address)}</textarea>
     </div>
+    ${isSaved ? `
+    <div class="tagLabel">태그</div>
+    <div class="tagContainer">
+      ${['데이트', '가족', '혼밥', '회식', '점심', '술자리'].map(tag => `
+        <button class="tag ${getTags(name, address).includes(tag) ? 'active' : ''}" 
+          onclick="toggleTag(${idx}, '${tag}', this)">${tag}</button>
+      `).join('')}
+    </div>` : ''}
     ${buildReviews(place.reviews)}
     <div class="popupBtns">
-      <button class="btnGoogle" onclick="window.open('https://www.google.com/maps/search/${searchQuery}', '_blank')">구글 지도에서 리뷰 더 보기</button>
-      <button class="btnNaver" onclick="window.open('https://map.naver.com/v5/search/${searchQuery}', '_blank')">네이버 지도에서 리뷰 더 보기</button>
-      <button class="btnKakao" onclick="window.open('https://map.kakao.com/?q=${searchQuery}', '_blank')">카카오맵에서 리뷰 더 보기</button>
+      <button class="btnGoogle" onclick="openBrowser('https://www.google.com/maps/search/${searchQuery}')">구글 지도에서 리뷰 더 보기</button>
+      <button class="btnNaver" onclick="openBrowser('https://map.naver.com/v5/search/${searchQuery}')">네이버 지도에서 리뷰 더 보기</button>
+      <button class="btnKakao" onclick="openBrowser('https://map.kakao.com/?q=${searchQuery}')">카카오맵에서 리뷰 더 보기</button>
       <button class="btnSave" id="saveBtn" onclick="toggleSave(${idx})">${isSaved ? '⭐ 내 맛집 해제' : '☆ 내 맛집 저장'}</button>
+      ${isSaved ? `<button class="btnVisit" onclick="markVisit('${name}', '${address}')">📅 방문했어요</button>` : ''}
     </div>
   `;
 
@@ -209,17 +221,47 @@ function renderMyList() {
     return;
   }
 
-  body.innerHTML = myList.map((item, idx) => `
-    <div class="myListItem" onclick="openMyListPopup(${idx})">
+  // 정렬
+  const sorted = [...myList].sort((a, b) => {
+    if (currentSort === 'name') return a.name.localeCompare(b.name);
+    if (currentSort === 'rating') return (b.rating || 0) - (a.rating || 0);
+    if (currentSort === 'visit') {
+      if (!a.lastVisit) return 1;
+      if (!b.lastVisit) return -1;
+      return b.lastVisit.localeCompare(a.lastVisit);
+    }
+    return 0;
+  });
+
+  body.innerHTML = sorted.map((item, idx) => {
+    const realIdx = myList.findIndex(i => i.name === item.name && i.address === item.address);
+    return `
+    <div class="myListItem" onclick="openMyListPopup(${realIdx})">
       <div style="flex:1; cursor:pointer;">
         <div style="font-size:15px; font-weight:600;">${item.name}</div>
         <div style="font-size:12px; color:#aaa; margin-top:2px;">${item.address}</div>
         <div style="font-size:13px; color:#FF6B35; margin-top:2px;">⭐ ${item.rating || '평점 없음'}</div>
-        <div class="memoText" onclick="event.stopPropagation(); editMemoInList(${idx}, this)">${item.memo || ''}</div>
+        ${item.lastVisit ? `<div class="visitDate">📅 마지막 방문: ${item.lastVisit}</div>` : ''}
+        ${item.visitCount ? `<div class="visitDate">🔢 총 방문: ${item.visitCount}회</div>` : ''}
+        ${item.tags?.length ? `
+          <div class="tagContainer" style="margin-top:6px">
+            ${item.tags.map(tag => `<span class="tag active" style="cursor:default">${tag}</span>`).join('')}
+          </div>` : ''}
+        <div class="memoText" onclick="event.stopPropagation(); editMemoInList(${realIdx}, this)">${item.memo || ''}</div>
       </div>
-      <button class="myListDelete" onclick="event.stopPropagation(); deleteMyList(${idx})">삭제</button>
+      <button class="myListDelete" onclick="event.stopPropagation(); deleteMyList(${realIdx})">삭제</button>
     </div>
-  `).join('');
+  `}).join('');
+
+  // 정렬 버튼 활성화
+  document.querySelectorAll('.sortBtn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.sort === currentSort);
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      currentSort = btn.dataset.sort;
+      renderMyList();
+    };
+  });
 }
 
 function openMyListPopup(idx) {
@@ -235,7 +277,7 @@ function openMyListPopup(idx) {
   if (placeIdx >= 0) {
     openPopup(placeIdx, true);
   } else {
-    const searchQuery = getSearchQuery(itemName);
+    const searchQuery = getSearchQuery(itemName, itemAddress);
     document.getElementById('popupBody').innerHTML = `
       <div class="popupName">${itemName}</div>
       <div class="popupRating">⭐ ${item.rating || '평점 없음'}</div>
@@ -323,6 +365,7 @@ document.querySelectorAll('.radiusBtn').forEach(btn => {
 
 // 내 위치 버튼
 document.getElementById('myLocationBtn').onclick = () => {
+  document.getElementById('locationInput').value = '';
   navigator.geolocation.getCurrentPosition(
     position => {
       currentLat = position.coords.latitude;
@@ -332,7 +375,8 @@ document.getElementById('myLocationBtn').onclick = () => {
     },
     error => {
       alert('위치 정보를 가져올 수 없어요 😢');
-    }
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000}
   );
 };
 
@@ -354,7 +398,8 @@ function searchLocation() {
       },
       error => {
         alert('위치 정보를 가져올 수 없어요 😢');
-      }
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000}
     );
     return;
   }
@@ -522,5 +567,72 @@ function openMap(lat, lng) {
   } else {
     map.setCenter({ lat, lng });
     map.setZoom(15);
+  }
+}
+
+function markVisit(name, address) {
+  const idx = myList.findIndex(i => i.name === name && i.address === address);
+  if (idx >= 0) {
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
+    
+    // 오늘 이미 방문 기록했으면 무시
+    if (myList[idx].lastVisit === dateStr) {
+      alert(`오늘 이미 방문 기록했어요! 😊`);
+      return;
+    }
+
+    myList[idx].lastVisit = dateStr;
+    myList[idx].visitCount = (myList[idx].visitCount || 0) + 1;
+    localStorage.setItem('myList', JSON.stringify(myList));
+    alert(`📅 ${name} 방문 ${myList[idx].visitCount}회 기록됐어요!`);
+  }
+}
+
+// 목록 검색
+document.getElementById('searchListInput').addEventListener('input', (e) => {
+  const query = e.target.value.trim().toLowerCase();
+  if (!query) {
+    renderCards(currentPlaces);
+    return;
+  }
+  const filtered = currentPlaces.filter(p =>
+    (p.displayName?.text || '').toLowerCase().includes(query)
+  );
+  renderCards(filtered);
+});
+
+function getTags(name, address) {
+  const item = myList.find(i => i.name === name && i.address === address);
+  return item?.tags || [];
+}
+
+function toggleTag(idx, tag, el) {
+  const place = currentPlaces[idx];
+  if (!place) return;
+  const name = place.displayName?.text || '';
+  const address = place.formattedAddress || '';
+  const listIdx = myList.findIndex(i => i.name === name && i.address === address);
+  if (listIdx < 0) return;
+
+  if (!myList[listIdx].tags) myList[listIdx].tags = [];
+
+  const tagIdx = myList[listIdx].tags.indexOf(tag);
+  if (tagIdx >= 0) {
+    myList[listIdx].tags.splice(tagIdx, 1);
+    el.classList.remove('active');
+  } else {
+    myList[listIdx].tags.push(tag);
+    el.classList.add('active');
+  }
+
+  localStorage.setItem('myList', JSON.stringify(myList));
+}
+
+async function openBrowser(url) {
+  if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+    await window.Capacitor.Plugins.Browser.open({ url });
+  } else {
+    window.open(url, '_blank');
   }
 }

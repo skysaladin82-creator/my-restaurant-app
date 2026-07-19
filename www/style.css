@@ -56,20 +56,24 @@ header h1 {
   background: #f0f0f0;
   color: #333;
   border: none;
-  padding: 8px 10px;
+  padding: 8px 8px;
   border-radius: 20px;
-  font-size: 13px;
+  font-size: 12px;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #locationInput {
   flex: 1;
+  min-width: 0;
   border: 1px solid #ddd;
   border-radius: 20px;
-  padding: 8px 14px;
-  font-size: 14px;
+  padding: 8px 10px;
+  font-size: 13px;
   outline: none;
 }
 
@@ -80,17 +84,6 @@ header h1 {
 #searchBtn {
   background: #FF6B35;
   color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 20px;
-  font-size: 14px;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-#myLocationBtn {
-  background: #f0f0f0;
-  color: #333;
   border: none;
   padding: 8px 14px;
   border-radius: 20px;
@@ -508,4 +501,90 @@ header h1 {
 
 .reviewMore:hover {
   background: #f9f9f9;
+}
+
+.btnVisit {
+  background: #fff;
+  color: #4CAF50;
+  border: 2px solid #4CAF50;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.visitDate {
+  font-size: 12px;
+  color: #4CAF50;
+  margin-top: 4px;
+}
+
+#searchListBar {
+  padding: 10px 16px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+#searchListInput {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 14px;
+  outline: none;
+}
+
+#searchListInput:focus {
+  border-color: #FF6B35;
+}
+
+.tagContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.tag {
+  background: #f0f0f0;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  color: #555;
+}
+
+.tag.active {
+  background: #FF6B35;
+  color: white;
+}
+
+.tagLabel {
+  font-size: 13px;
+  color: #888;
+  margin-top: 12px;
+  margin-bottom: 4px;
+}
+
+#myListSortBar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.sortBtn {
+  background: #f0f0f0;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #555;
+}
+
+.sortBtn.active {
+  background: #FF6B35;
+  color: white;
 }

@@ -20,6 +20,7 @@
   "homepage": "https://github.com/skysaladin82-creator/my-restaurant-app#readme",
   "dependencies": {
     "@capacitor/android": "^8.4.2",
+    "@capacitor/browser": "^8.0.4",
     "@capacitor/cli": "^8.4.2",
     "@capacitor/core": "^8.4.2"
   }

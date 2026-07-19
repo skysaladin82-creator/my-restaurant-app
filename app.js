@@ -102,8 +102,9 @@ function renderCards(places) {
   }).join('');
 }
 
-function getSearchQuery(name) {
-  return encodeURIComponent(name);
+function getSearchQuery(name, address) {
+  const shortAddr = address ? address.replace('대한민국', '').trim().split(' ').slice(0, 3).join(' ') : '';
+  return encodeURIComponent(name + (shortAddr ? ' ' + shortAddr : ''));
 }
 
 function openPopup(idx, fromMyList = false) {
@@ -122,7 +123,7 @@ function openPopup(idx, fromMyList = false) {
     : null;
 
   const isSaved = myList.some(item => item.name === name && item.address === address);
-  const searchQuery = getSearchQuery(name);
+  const searchQuery = getSearchQuery(name, address);
 
   document.getElementById('popupBody').innerHTML = `
     <div id="popupHeader">
@@ -148,9 +149,9 @@ function openPopup(idx, fromMyList = false) {
     </div>` : ''}
     ${buildReviews(place.reviews)}
     <div class="popupBtns">
-      <button class="btnGoogle" onclick="window.open('https://www.google.com/maps/search/${searchQuery}', '_blank')">구글 지도에서 리뷰 더 보기</button>
-      <button class="btnNaver" onclick="window.open('https://map.naver.com/v5/search/${searchQuery}', '_blank')">네이버 지도에서 리뷰 더 보기</button>
-      <button class="btnKakao" onclick="window.open('https://map.kakao.com/?q=${searchQuery}', '_blank')">카카오맵에서 리뷰 더 보기</button>
+      <button class="btnGoogle" onclick="openBrowser('https://www.google.com/maps/search/${searchQuery}')">구글 지도에서 리뷰 더 보기</button>
+      <button class="btnNaver" onclick="openBrowser('https://map.naver.com/v5/search/${searchQuery}')">네이버 지도에서 리뷰 더 보기</button>
+      <button class="btnKakao" onclick="openBrowser('https://map.kakao.com/?q=${searchQuery}')">카카오맵에서 리뷰 더 보기</button>
       <button class="btnSave" id="saveBtn" onclick="toggleSave(${idx})">${isSaved ? '⭐ 내 맛집 해제' : '☆ 내 맛집 저장'}</button>
       ${isSaved ? `<button class="btnVisit" onclick="markVisit('${name}', '${address}')">📅 방문했어요</button>` : ''}
     </div>
@@ -276,7 +277,7 @@ function openMyListPopup(idx) {
   if (placeIdx >= 0) {
     openPopup(placeIdx, true);
   } else {
-    const searchQuery = getSearchQuery(itemName);
+    const searchQuery = getSearchQuery(itemName, itemAddress);
     document.getElementById('popupBody').innerHTML = `
       <div class="popupName">${itemName}</div>
       <div class="popupRating">⭐ ${item.rating || '평점 없음'}</div>
@@ -626,4 +627,12 @@ function toggleTag(idx, tag, el) {
   }
 
   localStorage.setItem('myList', JSON.stringify(myList));
+}
+
+async function openBrowser(url) {
+  if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+    await window.Capacitor.Plugins.Browser.open({ url });
+  } else {
+    window.open(url, '_blank');
+  }
 }
