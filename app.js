@@ -137,6 +137,14 @@ function openPopup(idx, fromMyList = false) {
     <div class="popupInfo">
       <textarea class="memoInput" rows="2" placeholder="메모를 입력하세요" onchange="saveMemo(${idx}, this.value)">${getMemo(name, address)}</textarea>
     </div>
+    ${isSaved ? `
+    <div class="tagLabel">태그</div>
+    <div class="tagContainer">
+      ${['데이트', '가족', '혼밥', '회식', '점심', '술자리'].map(tag => `
+        <button class="tag ${getTags(name, address).includes(tag) ? 'active' : ''}" 
+          onclick="toggleTag(${idx}, '${tag}', this)">${tag}</button>
+      `).join('')}
+    </div>` : ''}
     ${buildReviews(place.reviews)}
     <div class="popupBtns">
       <button class="btnGoogle" onclick="window.open('https://www.google.com/maps/search/${searchQuery}', '_blank')">구글 지도에서 리뷰 더 보기</button>
@@ -219,6 +227,10 @@ function renderMyList() {
         <div style="font-size:13px; color:#FF6B35; margin-top:2px;">⭐ ${item.rating || '평점 없음'}</div>
         ${item.lastVisit ? `<div class="visitDate">📅 마지막 방문: ${item.lastVisit}</div>` : ''}
         ${item.visitCount ? `<div class="visitDate">🔢 총 방문: ${item.visitCount}회</div>` : ''}
+        ${item.tags?.length ? `
+          <div class="tagContainer" style="margin-top:6px">
+            ${item.tags.map(tag => `<span class="tag active" style="cursor:default">${tag}</span>`).join('')}
+          </div>` : ''}
         <div class="memoText" onclick="event.stopPropagation(); editMemoInList(${idx}, this)">${item.memo || ''}</div>
       </div>
       <button class="myListDelete" onclick="event.stopPropagation(); deleteMyList(${idx})">삭제</button>
@@ -563,3 +575,30 @@ document.getElementById('searchListInput').addEventListener('input', (e) => {
   );
   renderCards(filtered);
 });
+
+function getTags(name, address) {
+  const item = myList.find(i => i.name === name && i.address === address);
+  return item?.tags || [];
+}
+
+function toggleTag(idx, tag, el) {
+  const place = currentPlaces[idx];
+  if (!place) return;
+  const name = place.displayName?.text || '';
+  const address = place.formattedAddress || '';
+  const listIdx = myList.findIndex(i => i.name === name && i.address === address);
+  if (listIdx < 0) return;
+
+  if (!myList[listIdx].tags) myList[listIdx].tags = [];
+
+  const tagIdx = myList[listIdx].tags.indexOf(tag);
+  if (tagIdx >= 0) {
+    myList[listIdx].tags.splice(tagIdx, 1);
+    el.classList.remove('active');
+  } else {
+    myList[listIdx].tags.push(tag);
+    el.classList.add('active');
+  }
+
+  localStorage.setItem('myList', JSON.stringify(myList));
+}

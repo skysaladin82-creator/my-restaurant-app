@@ -538,3 +538,32 @@ header h1 {
 #searchListInput:focus {
   border-color: #FF6B35;
 }
+
+.tagContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.tag {
+  background: #f0f0f0;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  color: #555;
+}
+
+.tag.active {
+  background: #FF6B35;
+  color: white;
+}
+
+.tagLabel {
+  font-size: 13px;
+  color: #888;
+  margin-top: 12px;
+  margin-bottom: 4px;
+}
