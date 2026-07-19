@@ -5,7 +5,6 @@ let myList = JSON.parse(localStorage.getItem('myList')) || [];
 let currentLat = null;
 let currentLng = null;
 let currentRadius = 500;
-let openNowOnly = false;
 let map = null;
 let marker = null;
 let mapOpen = false;
@@ -72,11 +71,6 @@ async function loadRestaurants(lat, lng, type) {
 
 function renderCards(places) {
   const list = document.getElementById('restaurantList');
-
-  // 영업 중 필터 적용
-  const filtered = openNowOnly
-    ? places.filter(p => p.currentOpeningHours?.openNow === true)
-    : places;
 
   if (places.length === 0) {
     list.innerHTML = '<p id="loadingMsg">주변 식당을 찾을 수 없어요 😢</p>';
@@ -534,15 +528,3 @@ function openMap(lat, lng) {
     map.setZoom(15);
   }
 }
-
-// 영업 중 필터 버튼
-document.getElementById('openNowBtn').addEventListener('click', () => {
-  openNowOnly = !openNowOnly;
-  const btn = document.getElementById('openNowBtn');
-  if (openNowOnly) {
-    btn.classList.add('active');
-  } else {
-    btn.classList.remove('active');
-  }
-  renderCards(currentPlaces);
-});
