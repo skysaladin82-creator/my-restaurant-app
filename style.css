@@ -56,12 +56,15 @@ header h1 {
   background: #f0f0f0;
   color: #333;
   border: none;
-  padding: 8px 10px;
+  padding: 8px 8px;
   border-radius: 20px;
-  font-size: 13px;
+  font-size: 12px;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #locationInput {
