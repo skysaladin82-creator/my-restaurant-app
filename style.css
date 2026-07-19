@@ -502,3 +502,24 @@ header h1 {
 .reviewMore:hover {
   background: #f9f9f9;
 }
+
+#openNowBar {
+  padding: 10px 16px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+.openNowBtn {
+  background: #f0f0f0;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #555;
+}
+
+.openNowBtn.active {
+  background: #4CAF50;
+  color: white;
+}
