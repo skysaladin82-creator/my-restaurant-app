@@ -149,9 +149,9 @@ function openPopup(idx, fromMyList = false) {
     </div>` : ''}
     ${buildReviews(place.reviews)}
     <div class="popupBtns">
-      <button class="btnGoogle" onclick="openBrowser('https://www.google.com/maps/search/${searchQuery}')">구글 지도에서 리뷰 더 보기</button>
-      <button class="btnNaver" onclick="openBrowser('https://map.naver.com/v5/search/${searchQuery}')">네이버 지도에서 리뷰 더 보기</button>
-      <button class="btnKakao" onclick="openBrowser('https://map.kakao.com/?q=${searchQuery}')">카카오맵에서 리뷰 더 보기</button>
+      <button class="btnNaver" onclick="openMap('naver', '${name}', '${searchQuery}')">네이버 지도에서 리뷰 더 보기</button>
+      <button class="btnKakao" onclick="openMap('kakao', '${name}', '${searchQuery}')">카카오맵에서 리뷰 더 보기</button>
+      <button class="btnGoogle" onclick="openMap('google', '${name}', '${searchQuery}')">구글 지도에서 리뷰 더 보기</button>
       <button class="btnSave" id="saveBtn" onclick="toggleSave(${idx})">${isSaved ? '⭐ 내 맛집 해제' : '☆ 내 맛집 저장'}</button>
       ${isSaved ? `<button class="btnVisit" onclick="markVisit('${name}', '${address}')">📅 방문했어요</button>` : ''}
     </div>
@@ -629,10 +629,34 @@ function toggleTag(idx, tag, el) {
   localStorage.setItem('myList', JSON.stringify(myList));
 }
 
-async function openBrowser(url) {
+async function openMap(type, name, query) {
+  const naverQuery = encodeURIComponent(name);  // 네이버는 이름만
+  
+  const appUrls = {
+    naver: `nmap://search?query=${naverQuery}&appname=com.myrestaurant.app`,
+    kakao: `kakaomap://search?q=${query}`,
+    google: `comgooglemaps://?q=${query}`
+  };
+
+  const webUrls = {
+    naver: `https://map.naver.com/v5/search/${naverQuery}`,
+    kakao: `https://map.kakao.com/?q=${query}`,
+    google: `https://www.google.com/maps/search/${query}`
+  };
+
   if (window.Capacitor && window.Capacitor.isNativePlatform()) {
-    await window.Capacitor.Plugins.Browser.open({ url });
+    try {
+      // 네이티브 앱 열기 시도
+      await window.Capacitor.Plugins.Browser.open({ url: appUrls[type] });
+      
+      // 1.5초 후 앱이 안 열렸으면 인앱 브라우저로 열기
+      setTimeout(async () => {
+        await window.Capacitor.Plugins.Browser.open({ url: webUrls[type] });
+      }, 1500);
+    } catch (e) {
+      await window.Capacitor.Plugins.Browser.open({ url: webUrls[type] });
+    }
   } else {
-    window.open(url, '_blank');
+    window.open(webUrls[type], '_blank');
   }
 }
