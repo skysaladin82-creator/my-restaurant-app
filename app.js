@@ -143,6 +143,7 @@ function openPopup(idx, fromMyList = false) {
       <button class="btnNaver" onclick="window.open('https://map.naver.com/v5/search/${searchQuery}', '_blank')">네이버 지도에서 리뷰 더 보기</button>
       <button class="btnKakao" onclick="window.open('https://map.kakao.com/?q=${searchQuery}', '_blank')">카카오맵에서 리뷰 더 보기</button>
       <button class="btnSave" id="saveBtn" onclick="toggleSave(${idx})">${isSaved ? '⭐ 내 맛집 해제' : '☆ 내 맛집 저장'}</button>
+      ${isSaved ? `<button class="btnVisit" onclick="markVisit('${name}', '${address}')">📅 방문했어요</button>` : ''}
     </div>
   `;
 
@@ -216,6 +217,7 @@ function renderMyList() {
         <div style="font-size:15px; font-weight:600;">${item.name}</div>
         <div style="font-size:12px; color:#aaa; margin-top:2px;">${item.address}</div>
         <div style="font-size:13px; color:#FF6B35; margin-top:2px;">⭐ ${item.rating || '평점 없음'}</div>
+        ${item.lastVisit ? `<div class="visitDate">📅 마지막 방문: ${item.lastVisit}</div>` : ''}
         <div class="memoText" onclick="event.stopPropagation(); editMemoInList(${idx}, this)">${item.memo || ''}</div>
       </div>
       <button class="myListDelete" onclick="event.stopPropagation(); deleteMyList(${idx})">삭제</button>
@@ -526,5 +528,16 @@ function openMap(lat, lng) {
   } else {
     map.setCenter({ lat, lng });
     map.setZoom(15);
+  }
+}
+
+function markVisit(name, address) {
+  const idx = myList.findIndex(i => i.name === name && i.address === address);
+  if (idx >= 0) {
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
+    myList[idx].lastVisit = dateStr;
+    localStorage.setItem('myList', JSON.stringify(myList));
+    alert(`📅 ${name} 방문 기록 저장됐어요!`);
   }
 }
