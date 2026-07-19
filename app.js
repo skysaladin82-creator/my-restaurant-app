@@ -630,13 +630,7 @@ function toggleTag(idx, tag, el) {
 }
 
 async function openMap(type, name, query) {
-  const naverQuery = encodeURIComponent(name);  // 네이버는 이름만
-  
-  const appUrls = {
-    naver: `nmap://search?query=${naverQuery}&appname=com.myrestaurant.app`,
-    kakao: `kakaomap://search?q=${query}`,
-    google: `comgooglemaps://?q=${query}`
-  };
+  const naverQuery = encodeURIComponent(name);
 
   const webUrls = {
     naver: `https://map.naver.com/v5/search/${naverQuery}`,
@@ -644,19 +638,5 @@ async function openMap(type, name, query) {
     google: `https://www.google.com/maps/search/${query}`
   };
 
-  if (window.Capacitor && window.Capacitor.isNativePlatform()) {
-    try {
-      // 네이티브 앱 열기 시도
-      await window.Capacitor.Plugins.Browser.open({ url: appUrls[type] });
-      
-      // 1.5초 후 앱이 안 열렸으면 인앱 브라우저로 열기
-      setTimeout(async () => {
-        await window.Capacitor.Plugins.Browser.open({ url: webUrls[type] });
-      }, 1500);
-    } catch (e) {
-      await window.Capacitor.Plugins.Browser.open({ url: webUrls[type] });
-    }
-  } else {
-    window.open(webUrls[type], '_blank');
-  }
+  window.open(webUrls[type], '_blank');
 }
