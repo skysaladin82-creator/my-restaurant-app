@@ -567,3 +567,24 @@ header h1 {
   margin-top: 12px;
   margin-bottom: 4px;
 }
+
+#myListSortBar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.sortBtn {
+  background: #f0f0f0;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #555;
+}
+
+.sortBtn.active {
+  background: #FF6B35;
+  color: white;
+}

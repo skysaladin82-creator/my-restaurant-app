@@ -8,6 +8,7 @@ let currentRadius = 500;
 let map = null;
 let marker = null;
 let mapOpen = false;
+let currentSort = 'name';
 
 // 내 위치로 시작
 navigator.geolocation.getCurrentPosition(
@@ -219,8 +220,22 @@ function renderMyList() {
     return;
   }
 
-  body.innerHTML = myList.map((item, idx) => `
-    <div class="myListItem" onclick="openMyListPopup(${idx})">
+  // 정렬
+  const sorted = [...myList].sort((a, b) => {
+    if (currentSort === 'name') return a.name.localeCompare(b.name);
+    if (currentSort === 'rating') return (b.rating || 0) - (a.rating || 0);
+    if (currentSort === 'visit') {
+      if (!a.lastVisit) return 1;
+      if (!b.lastVisit) return -1;
+      return b.lastVisit.localeCompare(a.lastVisit);
+    }
+    return 0;
+  });
+
+  body.innerHTML = sorted.map((item, idx) => {
+    const realIdx = myList.findIndex(i => i.name === item.name && i.address === item.address);
+    return `
+    <div class="myListItem" onclick="openMyListPopup(${realIdx})">
       <div style="flex:1; cursor:pointer;">
         <div style="font-size:15px; font-weight:600;">${item.name}</div>
         <div style="font-size:12px; color:#aaa; margin-top:2px;">${item.address}</div>
@@ -231,11 +246,21 @@ function renderMyList() {
           <div class="tagContainer" style="margin-top:6px">
             ${item.tags.map(tag => `<span class="tag active" style="cursor:default">${tag}</span>`).join('')}
           </div>` : ''}
-        <div class="memoText" onclick="event.stopPropagation(); editMemoInList(${idx}, this)">${item.memo || ''}</div>
+        <div class="memoText" onclick="event.stopPropagation(); editMemoInList(${realIdx}, this)">${item.memo || ''}</div>
       </div>
-      <button class="myListDelete" onclick="event.stopPropagation(); deleteMyList(${idx})">삭제</button>
+      <button class="myListDelete" onclick="event.stopPropagation(); deleteMyList(${realIdx})">삭제</button>
     </div>
-  `).join('');
+  `}).join('');
+
+  // 정렬 버튼 활성화
+  document.querySelectorAll('.sortBtn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.sort === currentSort);
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      currentSort = btn.dataset.sort;
+      renderMyList();
+    };
+  });
 }
 
 function openMyListPopup(idx) {
