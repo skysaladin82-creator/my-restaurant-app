@@ -218,6 +218,7 @@ function renderMyList() {
         <div style="font-size:12px; color:#aaa; margin-top:2px;">${item.address}</div>
         <div style="font-size:13px; color:#FF6B35; margin-top:2px;">⭐ ${item.rating || '평점 없음'}</div>
         ${item.lastVisit ? `<div class="visitDate">📅 마지막 방문: ${item.lastVisit}</div>` : ''}
+        ${item.visitCount ? `<div class="visitDate">🔢 총 방문: ${item.visitCount}회</div>` : ''}
         <div class="memoText" onclick="event.stopPropagation(); editMemoInList(${idx}, this)">${item.memo || ''}</div>
       </div>
       <button class="myListDelete" onclick="event.stopPropagation(); deleteMyList(${idx})">삭제</button>
@@ -537,8 +538,9 @@ function markVisit(name, address) {
     const now = new Date();
     const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
     myList[idx].lastVisit = dateStr;
+    myList[idx].visitCount = (myList[idx].visitCount || 0) + 1;
     localStorage.setItem('myList', JSON.stringify(myList));
-    alert(`📅 ${name} 방문 기록 저장됐어요!`);
+    alert(`📅 ${name} 방문 ${myList[idx].visitCount}회 기록됐어요!`);
   }
 }
 
