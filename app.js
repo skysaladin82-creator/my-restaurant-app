@@ -90,7 +90,8 @@ function renderCards(places) {
 
     return `
       <div class="restaurantCard" onclick="openPopup(${idx})">
-        <img class="cardPhoto" src="${photo}" alt="${name}">
+        <img class="cardPhoto" src="${photo}" alt="${name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+        <div class="cardPhotoEmpty" style="display:none">🍽️</div>
         <div class="cardInfo">
           <div class="cardName">${name}</div>
           <div class="cardRating">${rating}</div>

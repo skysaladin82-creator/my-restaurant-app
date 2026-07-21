@@ -588,3 +588,15 @@ header h1 {
   background: #FF6B35;
   color: white;
 }
+
+.cardPhotoEmpty {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  background: #FFE8DF;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+}
