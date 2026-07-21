@@ -20,7 +20,7 @@ navigator.geolocation.getCurrentPosition(
   error => {
     showLoading('위치 정보를 가져올 수 없어요 😢');
   },
-  { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000}
+  { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
 );
 
 function showLoading(msg) {
@@ -124,6 +124,7 @@ function openPopup(idx, fromMyList = false) {
 
   const isSaved = myList.some(item => item.name === name && item.address === address);
   const searchQuery = getSearchQuery(name, address);
+  const naverQuery = encodeURIComponent(name);
 
   document.getElementById('popupBody').innerHTML = `
     <div id="popupHeader">
@@ -149,9 +150,9 @@ function openPopup(idx, fromMyList = false) {
     </div>` : ''}
     ${buildReviews(place.reviews)}
     <div class="popupBtns">
-      <button class="btnNaver" onclick="openMap('naver', '${name}', '${searchQuery}')">네이버 지도에서 리뷰 더 보기</button>
-      <button class="btnKakao" onclick="openMap('kakao', '${name}', '${searchQuery}')">카카오맵에서 리뷰 더 보기</button>
-      <button class="btnGoogle" onclick="openMap('google', '${name}', '${searchQuery}')">구글 지도에서 리뷰 더 보기</button>
+      <button class="btnNaver" onclick="openExternalMap('naver', '${naverQuery}', '${searchQuery}')">네이버 지도에서 리뷰 더 보기</button>
+      <button class="btnKakao" onclick="openExternalMap('kakao', '${naverQuery}', '${searchQuery}')">카카오맵에서 리뷰 더 보기</button>
+      <button class="btnGoogle" onclick="openExternalMap('google', '${naverQuery}', '${searchQuery}')">구글 지도에서 리뷰 더 보기</button>
       <button class="btnSave" id="saveBtn" onclick="toggleSave(${idx})">${isSaved ? '⭐ 내 맛집 해제' : '☆ 내 맛집 저장'}</button>
       ${isSaved ? `<button class="btnVisit" onclick="markVisit('${name}', '${address}')">📅 방문했어요</button>` : ''}
     </div>
@@ -221,7 +222,6 @@ function renderMyList() {
     return;
   }
 
-  // 정렬
   const sorted = [...myList].sort((a, b) => {
     if (currentSort === 'name') return a.name.localeCompare(b.name);
     if (currentSort === 'rating') return (b.rating || 0) - (a.rating || 0);
@@ -253,7 +253,6 @@ function renderMyList() {
     </div>
   `}).join('');
 
-  // 정렬 버튼 활성화
   document.querySelectorAll('.sortBtn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.sort === currentSort);
     btn.onclick = (e) => {
@@ -278,6 +277,7 @@ function openMyListPopup(idx) {
     openPopup(placeIdx, true);
   } else {
     const searchQuery = getSearchQuery(itemName, itemAddress);
+    const naverQuery = encodeURIComponent(itemName);
     document.getElementById('popupBody').innerHTML = `
       <div class="popupName">${itemName}</div>
       <div class="popupRating">⭐ ${item.rating || '평점 없음'}</div>
@@ -287,9 +287,9 @@ function openMyListPopup(idx) {
         <textarea class="memoInput" rows="2" placeholder="메모를 입력하세요" onchange="saveMemoFromList(${idx}, this.value)">${item.memo || ''}</textarea>
       </div>
       <div class="popupBtns">
-        <button class="btnGoogle" onclick="window.open('https://www.google.com/maps/search/${searchQuery}', '_blank')">구글 지도에서 리뷰 더 보기</button>
-        <button class="btnNaver" onclick="window.open('https://map.naver.com/v5/search/${searchQuery}', '_blank')">네이버 지도에서 리뷰 더 보기</button>
-        <button class="btnKakao" onclick="window.open('https://map.kakao.com/?q=${searchQuery}', '_blank')">카카오맵에서 리뷰 더 보기</button>
+        <button class="btnNaver" onclick="openExternalMap('naver', '${naverQuery}', '${searchQuery}')">네이버 지도에서 리뷰 더 보기</button>
+        <button class="btnKakao" onclick="openExternalMap('kakao', '${naverQuery}', '${searchQuery}')">카카오맵에서 리뷰 더 보기</button>
+        <button class="btnGoogle" onclick="openExternalMap('google', '${naverQuery}', '${searchQuery}')">구글 지도에서 리뷰 더 보기</button>
       </div>
     `;
     document.getElementById('myListPopup').classList.add('hidden');
@@ -376,7 +376,7 @@ document.getElementById('myLocationBtn').onclick = () => {
     error => {
       alert('위치 정보를 가져올 수 없어요 😢');
     },
-    { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000}
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
   );
 };
 
@@ -393,7 +393,7 @@ function searchLocation() {
       position => {
         currentLat = position.coords.latitude;
         currentLng = position.coords.longitude;
-        openMapView(currentLat, currentLng);
+        openMapContainer(currentLat, currentLng);
         loadRestaurants(currentLat, currentLng, document.querySelector('.filterBtn.active').dataset.type);
       },
       error => {
@@ -409,41 +409,9 @@ function searchLocation() {
     if (status === 'OK' && results[0]) {
       currentLat = results[0].geometry.location.lat();
       currentLng = results[0].geometry.location.lng();
+      document.getElementById('locationInput').value = '';
 
-      // 지도 자동으로 열기
-      const container = document.getElementById('mapContainer');
-      if (!mapOpen) {
-        mapOpen = true;
-        container.classList.add('open');
-        document.getElementById('mapToggleBtn').textContent = '🗺️ 지도 닫기';
-      }
-
-      // 지도 초기화 안됐으면 초기화
-      if (!map) {
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: { lat: currentLat, lng: currentLng },
-          zoom: 15,
-          disableDefaultUI: true,
-          zoomControl: true,
-        });
-
-        map.addListener('click', (e) => {
-          currentLat = e.latLng.lat();
-          currentLng = e.latLng.lng();
-
-          if (marker) marker.setMap(null);
-          marker = new google.maps.Marker({
-            position: { lat: currentLat, lng: currentLng },
-            map: map,
-            title: '선택한 위치'
-          });
-
-          loadRestaurants(currentLat, currentLng, document.querySelector('.filterBtn.active').dataset.type);
-        });
-      } else {
-        map.setCenter({ lat: currentLat, lng: currentLng });
-        map.setZoom(15);
-      }
+      openMapContainer(currentLat, currentLng);
 
       // 핀 찍기
       if (marker) marker.setMap(null);
@@ -458,6 +426,40 @@ function searchLocation() {
       alert('주소를 찾을 수 없어요. 예) 강남구 역삼동, 순천시 조곡동');
     }
   });
+}
+
+// 지도 컨테이너 열기 (내부 지도 뷰)
+function openMapContainer(lat, lng) {
+  const container = document.getElementById('mapContainer');
+  if (!mapOpen) {
+    mapOpen = true;
+    container.classList.add('open');
+    document.getElementById('mapToggleBtn').textContent = '🗺️ 지도 닫기';
+  }
+
+  if (!map) {
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: { lat, lng },
+      zoom: 15,
+      disableDefaultUI: true,
+      zoomControl: true,
+    });
+
+    map.addListener('click', (e) => {
+      currentLat = e.latLng.lat();
+      currentLng = e.latLng.lng();
+      if (marker) marker.setMap(null);
+      marker = new google.maps.Marker({
+        position: { lat: currentLat, lng: currentLng },
+        map: map,
+        title: '선택한 위치'
+      });
+      loadRestaurants(currentLat, currentLng, document.querySelector('.filterBtn.active').dataset.type);
+    });
+  } else {
+    map.setCenter({ lat, lng });
+    map.setZoom(15);
+  }
 }
 
 // 지도 토글
@@ -477,18 +479,15 @@ document.getElementById('mapToggleBtn').onclick = () => {
         zoomControl: true,
       });
 
-      // 지도 클릭 시 핀 찍기
       map.addListener('click', (e) => {
         currentLat = e.latLng.lat();
         currentLng = e.latLng.lng();
-
         if (marker) marker.setMap(null);
         marker = new google.maps.Marker({
           position: { lat: currentLat, lng: currentLng },
           map: map,
           title: '선택한 위치'
         });
-
         loadRestaurants(currentLat, currentLng, document.querySelector('.filterBtn.active').dataset.type);
       });
     } else {
@@ -501,6 +500,16 @@ document.getElementById('mapToggleBtn').onclick = () => {
     document.getElementById('mapToggleBtn').textContent = '🗺️ 지도 핀 찍기';
   }
 };
+
+// 네이버/카카오/구글 외부 지도 열기
+function openExternalMap(type, naverQuery, searchQuery) {
+  const webUrls = {
+    naver: `https://map.naver.com/v5/search/${naverQuery}`,
+    kakao: `https://map.kakao.com/?q=${searchQuery}`,
+    google: `https://www.google.com/maps/search/${searchQuery}`
+  };
+  window.open(webUrls[type], '_blank');
+}
 
 function buildReviews(reviews) {
   if (!reviews || reviews.length === 0) return '';
@@ -537,51 +546,15 @@ function toggleReviews(btn) {
   }
 }
 
-function openMap(lat, lng) {
-  const container = document.getElementById('mapContainer');
-  if (!mapOpen) {
-    mapOpen = true;
-    container.classList.add('open');
-    document.getElementById('mapToggleBtn').textContent = '🗺️ 지도 닫기';
-  }
-
-  if (!map) {
-    map = new google.maps.Map(document.getElementById('map'), {
-      center: { lat, lng },
-      zoom: 15,
-      disableDefaultUI: true,
-      zoomControl: true,
-    });
-
-    map.addListener('click', (e) => {
-      currentLat = e.latLng.lat();
-      currentLng = e.latLng.lng();
-      if (marker) marker.setMap(null);
-      marker = new google.maps.Marker({
-        position: { lat: currentLat, lng: currentLng },
-        map: map,
-        title: '선택한 위치'
-      });
-      loadRestaurants(currentLat, currentLng, document.querySelector('.filterBtn.active').dataset.type);
-    });
-  } else {
-    map.setCenter({ lat, lng });
-    map.setZoom(15);
-  }
-}
-
 function markVisit(name, address) {
   const idx = myList.findIndex(i => i.name === name && i.address === address);
   if (idx >= 0) {
     const now = new Date();
     const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
-    
-    // 오늘 이미 방문 기록했으면 무시
     if (myList[idx].lastVisit === dateStr) {
       alert(`오늘 이미 방문 기록했어요! 😊`);
       return;
     }
-
     myList[idx].lastVisit = dateStr;
     myList[idx].visitCount = (myList[idx].visitCount || 0) + 1;
     localStorage.setItem('myList', JSON.stringify(myList));
@@ -627,16 +600,4 @@ function toggleTag(idx, tag, el) {
   }
 
   localStorage.setItem('myList', JSON.stringify(myList));
-}
-
-async function openMapView(type, name, query) {
-  const naverQuery = encodeURIComponent(name);
-
-  const webUrls = {
-    naver: `https://map.naver.com/v5/search/${naverQuery}`,
-    kakao: `https://map.kakao.com/?q=${query}`,
-    google: `https://www.google.com/maps/search/${query}`
-  };
-
-  window.open(webUrls[type], '_blank');
 }
