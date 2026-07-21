@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500">
+  <!-- 배경 -->
+  <rect width="1024" height="500" fill="#FF6B35"/>
+  
+  <!-- 원형 장식 -->
+  <circle cx="150" cy="250" r="200" fill="#FF8C5A" opacity="0.4"/>
+  <circle cx="900" cy="250" r="180" fill="#FF8C5A" opacity="0.4"/>
+  
+  <!-- 포크 -->
+  <rect x="440" y="140" width="12" height="120" rx="6" fill="white"/>
+  <rect x="424" y="140" width="7" height="55" rx="3" fill="white"/>
+  <rect x="457" y="140" width="7" height="55" rx="3" fill="white"/>
+  <rect x="427" y="192" width="37" height="7" rx="3" fill="white"/>
+
+  <!-- 나이프 -->
+  <rect x="572" y="140" width="12" height="120" rx="6" fill="white"/>
+  <path d="M584 140 Q610 165 610 210 L584 210 Z" fill="white"/>
+
+  <!-- 위치 핀 -->
+  <circle cx="512" cy="230" r="30" fill="white"/>
+  <circle cx="512" cy="230" r="12" fill="#FF6B35"/>
+  <path d="M512 260 L498 290 L512 278 L526 290 Z" fill="white"/>
+
+  <!-- 텍스트 -->
+  <text x="512" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-size="52" font-weight="bold" fill="white">내 주변 맛집</text>
+  <text x="512" y="420" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="white" opacity="0.9">주변 음식점을 한눈에 확인하세요</text>
+</svg>
