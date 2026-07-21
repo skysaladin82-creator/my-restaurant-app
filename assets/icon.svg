@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- 배경 -->
+  <rect width="1024" height="1024" rx="200" fill="#FF6B35"/>
+
+  <!-- 접시 -->
+  <circle cx="512" cy="480" r="280" fill="white" opacity="0.15"/>
+  <circle cx="512" cy="480" r="220" fill="white" opacity="0.15"/>
+
+  <!-- 포크 -->
+  <rect x="420" y="240" width="24" height="240" rx="12" fill="white"/>
+  <rect x="390" y="240" width="14" height="110" rx="7" fill="white"/>
+  <rect x="448" y="240" width="14" height="110" rx="7" fill="white"/>
+  <rect x="394" y="340" width="70" height="14" rx="7" fill="white"/>
+
+  <!-- 나이프 -->
+  <rect x="580" y="240" width="24" height="240" rx="12" fill="white"/>
+  <path d="M604 240 Q660 290 660 370 L604 370 Z" fill="white"/>
+
+  <!-- 위치 핀 -->
+  <circle cx="512" cy="540" r="70" fill="white"/>
+  <circle cx="512" cy="540" r="30" fill="#FF6B35"/>
+  <path d="M512 610 L478 690 L512 665 L546 690 Z" fill="white"/>
+</svg>

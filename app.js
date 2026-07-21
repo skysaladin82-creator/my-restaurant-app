@@ -393,13 +393,13 @@ function searchLocation() {
       position => {
         currentLat = position.coords.latitude;
         currentLng = position.coords.longitude;
-        openMap(currentLat, currentLng);
+        openMapView(currentLat, currentLng);
         loadRestaurants(currentLat, currentLng, document.querySelector('.filterBtn.active').dataset.type);
       },
       error => {
         alert('위치 정보를 가져올 수 없어요 😢');
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000}
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
     );
     return;
   }
@@ -629,7 +629,7 @@ function toggleTag(idx, tag, el) {
   localStorage.setItem('myList', JSON.stringify(myList));
 }
 
-async function openMap(type, name, query) {
+async function openMapView(type, name, query) {
   const naverQuery = encodeURIComponent(name);
 
   const webUrls = {

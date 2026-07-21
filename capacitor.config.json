@@ -5,5 +5,14 @@
   "server": {
     "url": "https://my-restaurant-app-amber.vercel.app",
     "cleartext": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "launchAutoHide": true,
+      "backgroundColor": "#FF6B35",
+      "androidSplashResourceName": "splash",
+      "showSpinner": false
+    }
   }
 }
