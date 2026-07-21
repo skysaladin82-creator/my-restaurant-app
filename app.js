@@ -86,7 +86,7 @@ function renderCards(places) {
                      isOpen === false ? '<span class="cardClosed">영업 종료</span>' : '';
     const photo = place.photos?.[0]
       ? `https://places.googleapis.com/v1/${place.photos[0].name}/media?maxWidthPx=200&key=${API_KEY}`
-      : 'https://placehold.co/80x80?text=🍽️';
+      : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" rx="8" fill="%23FFE8DF"/><text x="40" y="48" text-anchor="middle" font-size="32">🍽️</text></svg>';
 
     return `
       <div class="restaurantCard" onclick="openPopup(${idx})">
